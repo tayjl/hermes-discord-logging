@@ -71,6 +71,7 @@ Turn it off with `hermes config set plugins.entries.discord-logging.settings.cha
 - The redactor decides what counts as a secret, so a key=value secret written mid-line may not be masked.
 - The gateway serves every profile from one process. The first profile that enables the plugin owns it.
 - Logs from the `discord`, `urllib3` and `http` loggers, and from this plugin, are never posted. A failed post can't cause a loop.
+- Logs from `agent.tool_executor` (routine tool failures such as a refused write or a failed command) are never posted either.
 - The plugin starts once the process owns the gateway lock. Errors logged before that point may be missed.
 
 ## Development

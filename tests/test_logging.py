@@ -72,6 +72,17 @@ def test_near_limit_wakes_flusher():
     assert c.wake.is_set()
 
 
+def test_tool_executor_excluded_but_not_siblings():
+    c, h = handler_with_collector()
+    for name in ("agent.tool_executor", "agent.tool_executor.terminal"):
+        h.emit(record(name=name))
+    assert c.drain() == []
+    for name in ("agent.tool_executor_x", "agent.foo"):
+        h.emit(record(name=name, msg=f"from {name}"))
+    out = "\n".join(c.drain())
+    assert "agent.tool_executor_x" in out and "agent.foo" in out
+
+
 def test_excluded_loggers_and_thread():
     c, h = handler_with_collector()
     for name in ("discord.client", "discord", "urllib3.connectionpool", "http.client", "hdl", "hdl.sender"):

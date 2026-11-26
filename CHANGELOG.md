@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Stops posting logs from `agent.tool_executor` and its children. Routine tool warnings were flooding the channel.
+
 ## 1.0.0
 
 - First release. Posts gateway warnings and errors to a Discord channel, batched about every 10 seconds, with identical repeats merged into one line (xN) and tracebacks clipped.

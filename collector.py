@@ -21,6 +21,9 @@ MAX_AGE_S = 24 * 3600  # turns that never end are dropped after this
 
 # Loggers that send or relay our posts: logging from them could loop.
 EXCLUDED_PREFIXES = ("discord", "urllib3", "urllib", "http", "requests")
+# Routine tool failures (refused write, no-match patch, exit 1). Matched as the
+# logger or its children only, so siblings like agent.tool_executor_x still post.
+EXCLUDED_TREES = ("agent.tool_executor",)
 OWN_THREAD = "hdl-sender"
 
 
@@ -213,6 +216,7 @@ class LogHandler(logging.Handler):
     def _excluded(self, record):
         name = record.name
         return (name.startswith(EXCLUDED_PREFIXES) or name == self._own or name.startswith(self._own + ".")
+                or any(name == t or name.startswith(t + ".") for t in EXCLUDED_TREES)
                 or record.threadName == OWN_THREAD)
 
     def emit(self, record):
