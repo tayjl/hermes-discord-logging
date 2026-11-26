@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Stops posting logs from `agent.tool_executor` and its children. Routine tool warnings were flooding the channel.
+- Shows the yellow title header only on the first post after the plugin starts, instead of on every post.
 
 ## 1.0.0
 

@@ -46,13 +46,13 @@ def clip(text, limit):
     return text if len(text) <= limit else text[: limit - 1] + "\u2026"
 
 
-def render(kind, secondary, lines):
+def render(kind, secondary, lines, header=True):
     """Split lines into framed messages that each fit Discord's limit.
 
-    Message 1 holds the header and the kind line, later ones start with a lone U+200B so they stack under it,
-    and the footer closes the last one. Every message reserves room for the footer.
+    Message 1 holds the header (unless header=False) and the kind line, later ones start with a lone U+200B so they
+    stack under it, and the footer closes the last one. Every message reserves room for the footer.
     """
-    head = f"{HEADER}\n**{kind}** | __{secondary}__\n"
+    head = (f"{HEADER}\n" if header else "") + f"**{kind}** | __{secondary}__\n"
     cont = "\u200b\n"
     fixed = u16(BOX_TOP) + u16(BOX_BOTTOM) + 1 + u16(FOOTER)
     messages, current, size, prefix = [], [], 0, head

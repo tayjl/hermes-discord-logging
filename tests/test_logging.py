@@ -188,6 +188,36 @@ def test_split_stays_within_2000_utf16_units():
     assert not any(m.endswith(style.FOOTER) for m in messages[:-1])
 
 
+def test_header_only_on_first_drain():
+    c, h = handler_with_collector()
+    h.emit(record(msg="one"))
+    assert c.drain()[0].startswith(style.HEADER)
+    h.emit(record(msg="two"))
+    second = c.drain()
+    assert second and style.HEADER not in second[0] and second[0].startswith("**Errors**")
+    assert c.drain() == []
+
+
+def test_header_not_used_up_by_empty_drain_and_only_first_kind_gets_it():
+    c, h = handler_with_collector()
+    assert c.drain() == []
+    h.emit(record(msg="boom"))
+    c.add_crash(["crashed"])
+    c.end_turn("t", "completed", None)  # unknown turn: ignored
+    messages = c.drain()
+    assert len(messages) == 2
+    assert messages[0].startswith(style.HEADER) and style.HEADER not in messages[1]
+
+
+def test_header_returns_after_reactivation():
+    first, h = handler_with_collector()
+    h.emit(record(msg="one"))
+    assert style.HEADER in first.drain()[0]
+    second, h2 = handler_with_collector()  # stop() then ensure() builds a fresh Collector
+    h2.emit(record(msg="two"))
+    assert style.HEADER in second.drain()[0]
+
+
 def test_header_matches_digest_escapes():
     if DIGEST.exists():
         digest = json.loads(DIGEST.read_text(encoding="utf-8"))

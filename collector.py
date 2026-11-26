@@ -78,6 +78,7 @@ class Collector:
         self.sent_ack = None  # the pending crash report's ack, for the sender to call after a successful post
         self._starts = {}  # turn_id -> [monotonic start, session_id, tool calls]
         self._size = 0
+        self._header_shown = False  # the header goes on the first post only; a new Collector (re-activation) shows it again
 
     def _grew(self, chars):
         self._size += chars
@@ -139,16 +140,22 @@ class Collector:
             self._size = 0
             self.wake.clear()
         messages = []
+
+        def add(kind, secondary, lines):
+            rendered = style.render(kind, secondary, lines, header=not self._header_shown)
+            self._header_shown = self._header_shown or bool(rendered)
+            messages.extend(rendered)
+
         if crash:
-            messages += style.render("Crash report", "gateway", [style.clip(scrub(line), LINE_CHARS) for line in crash])
+            add("Crash report", "gateway", [style.clip(scrub(line), LINE_CHARS) for line in crash])
         if errors:
-            messages += style.render("Errors", "gateway", self._error_lines(errors, dropped))
+            add("Errors", "gateway", self._error_lines(errors, dropped))
         if turns or turns_dropped:
             lines = [self._turn_line(*turn) for turn in turns]
             if turns_dropped:
                 lines.append(f"{turns_dropped} more turns not shown")
             count = len(turns) + turns_dropped
-            messages += style.render("Turns", f"{count} turn{'' if count == 1 else 's'}", lines)
+            add("Turns", f"{count} turn{'' if count == 1 else 's'}", lines)
         return messages
 
     @staticmethod

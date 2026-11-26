@@ -54,6 +54,7 @@ Set under `plugins.entries.discord-logging.settings`. Changes apply after a gate
 - **Turns.** One line per turn: time, session title, outcome (completed, failed or interrupted), duration and tool call count. The reply is never sent.
 - **Crash report.** If the gateway exited badly, the next start posts one summary from `gateway-exit-diag.log`. Each crash posts once, and is marked posted only after Discord accepts it. CRITICAL records post live, so they are not read again.
 - **Safe by design.** Every line goes through the Hermes redactor. Control characters are stripped before redaction. Messages never ping anyone. Triple backticks are neutralised. Long batches split under Discord's 2000 character limit.
+- **Header.** The yellow title box appears only on the first post after the gateway starts, not on every batch.
 
 The plugin only runs inside the gateway process. Anywhere else it does nothing.
 
