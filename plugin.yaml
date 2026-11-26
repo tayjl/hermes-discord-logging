@@ -1,0 +1,8 @@
+name: discord-logging
+version: 1.0.0
+description: Hermes Discord Logging. Post gateway warnings, errors and a one-line summary per turn to a Discord channel
+author: Tayler
+license: MIT
+requires_env:
+  - name: DISCORD_BOT_TOKEN
+    secret: true
